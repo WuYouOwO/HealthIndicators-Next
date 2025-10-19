@@ -7,11 +7,8 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.entity.LivingEntity;
 import org.joml.Matrix4f;
 
-// ...existing code...
-
 public class RenderUtils {
     public static void drawHeart(Matrix4f model, VertexConsumer vertexConsumer, float x, HeartTypeEnum type, LivingEntity livingEntity) {
-        // Delegate to opacity-aware overload at full opacity
         drawHeart(model, vertexConsumer, x, type, livingEntity, 1.0F);
     }
 
@@ -22,15 +19,17 @@ public class RenderUtils {
         float maxV = 1F;
 
         float heartSize = 9F;
+        
+        // fix z index
+        float z = (type == HeartTypeEnum.EMPTY) ? -0.01F : 0.01F;
 
-        vertexConsumer.vertex(model, x, 0F - heartSize, 0.0F).texture(minU, maxV).light(15728880).color(1.0F, 1.0F, 1.0F, opacity);
-        vertexConsumer.vertex(model, x - heartSize, 0F - heartSize, 0.0F).texture(maxU, maxV).light(15728880).color(1.0F, 1.0F, 1.0F, opacity);
-        vertexConsumer.vertex(model, x - heartSize, 0F, 0.0F).texture(maxU, minV).light(15728880).color(1.0F, 1.0F, 1.0F, opacity);
-        vertexConsumer.vertex(model, x, 0F, 0.0F).texture(minU, minV).light(15728880).color(1.0F, 1.0F, 1.0F, opacity);
+        vertexConsumer.vertex(model, x, 0F - heartSize, z).texture(minU, maxV).light(15728880).color(1.0F, 1.0F, 1.0F, opacity);
+        vertexConsumer.vertex(model, x - heartSize, 0F - heartSize, z).texture(maxU, maxV).light(15728880).color(1.0F, 1.0F, 1.0F, opacity);
+        vertexConsumer.vertex(model, x - heartSize, 0F, z).texture(maxU, minV).light(15728880).color(1.0F, 1.0F, 1.0F, opacity);
+        vertexConsumer.vertex(model, x, 0F, z).texture(minU, minV).light(15728880).color(1.0F, 1.0F, 1.0F, opacity);
     }
 
     public static void drawArmor(Matrix4f model, VertexConsumer vertexConsumer, float x, ArmorTypeEnum type) {
-        // Delegate to opacity-aware overload at full opacity
         drawArmor(model, vertexConsumer, x, type, 1.0F);
     }
 
@@ -41,11 +40,14 @@ public class RenderUtils {
         float maxV = 1F;
 
         float armorSize = 9F;
+        
+        // again fix z index
+        float z = (type == ArmorTypeEnum.EMPTY) ? -0.01F : 0.01F;
 
-        vertexConsumer.vertex(model, x, 0F - armorSize, 0.0F).texture(minU, maxV).light(15728880).color(1.0F, 1.0F, 1.0F, opacity);
-        vertexConsumer.vertex(model, x - armorSize, 0F - armorSize, 0.0F).texture(maxU, maxV).light(15728880).color(1.0F, 1.0F, 1.0F, opacity);
-        vertexConsumer.vertex(model, x - armorSize, 0F, 0.0F).texture(maxU, minV).light(15728880).color(1.0F, 1.0F, 1.0F, opacity);
-        vertexConsumer.vertex(model, x, 0F, 0.0F).texture(minU, minV).light(15728880).color(1.0F, 1.0F, 1.0F, opacity);
+        vertexConsumer.vertex(model, x, 0F - armorSize, z).texture(minU, maxV).light(15728880).color(1.0F, 1.0F, 1.0F, opacity);
+        vertexConsumer.vertex(model, x - armorSize, 0F - armorSize, z).texture(maxU, maxV).light(15728880).color(1.0F, 1.0F, 1.0F, opacity);
+        vertexConsumer.vertex(model, x - armorSize, 0F, z).texture(maxU, minV).light(15728880).color(1.0F, 1.0F, 1.0F, opacity);
+        vertexConsumer.vertex(model, x, 0F, z).texture(minU, minV).light(15728880).color(1.0F, 1.0F, 1.0F, opacity);
     }
 
     public static String getHealthText(LivingEntity livingEntity) {
@@ -54,13 +56,11 @@ public class RenderUtils {
         float maxHealth = livingEntity.getMaxHealth();
         float absorption = livingEntity.getAbsorptionAmount();
 
-        // Rounding off to the specified number of decimal places
         String healthStr = formatToDecimalPlaces(health + absorption, decimalPlaces);
         String maxHealthStr = formatToDecimalPlaces(maxHealth, decimalPlaces);
 
         if (ModConfig.HANDLER.instance().percentage_based_health) {
             float percentage = ((health + absorption) / maxHealth) * 100;
-            // Rounding off percentage to the specified number of decimal places
             String percentageStr = formatToDecimalPlaces(percentage, decimalPlaces);
             return percentageStr + " %";
         } else {
@@ -69,7 +69,6 @@ public class RenderUtils {
     }
 
     private static String formatToDecimalPlaces(float value, int decimalPlaces) {
-        // Convert the value to a string with the specified number of decimal places
         if (decimalPlaces == 0) {
             return String.format("%.0f", value);
         } else {

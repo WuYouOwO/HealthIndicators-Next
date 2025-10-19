@@ -31,38 +31,45 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-// ...existing code...
 import static io.github.adytech99.healthindicators.enums.HeartTypeEnum.addHardcoreIcon;
 import static io.github.adytech99.healthindicators.enums.HeartTypeEnum.addStatusIcon;
 @Mixin(LivingEntityRenderer.class)
 public abstract class EntityRendererMixin<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>>
         extends EntityRenderer<T, S>
         implements FeatureRendererContext<S, M> {
-    @Unique private LivingEntity mainLivingEntityThing;
+            
     @Unique private final MinecraftClient client = MinecraftClient.getInstance();
     @Unique private static final Identifier ICONS_TEXTURE = Identifier.of("minecraft", "textures/gui/icons.png");
+    @Unique private static final java.util.WeakHashMap<LivingEntityRenderState, LivingEntity> ENTITY_MAP = new java.util.WeakHashMap<>();
+    
     protected EntityRendererMixin(EntityRendererFactory.Context ctx) {
         super(ctx);
     }
     @Inject(method = "updateRenderState(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/render/entity/state/LivingEntityRenderState;F)V", at = @At("TAIL"))
     public void updateRenderState(T livingEntity, S livingEntityRenderState, float f, CallbackInfo ci){
-        mainLivingEntityThing = livingEntity;
+        // Store the entity in a WeakHashMap keyed by the render state
+        // This prevents the health sharing bug where entities of the same type show the same health
+        // Using WeakHashMap ensures render states are garbage collected when no longer needed
+        ENTITY_MAP.put(livingEntityRenderState, livingEntity);
     }
     @Inject(method = "render(Lnet/minecraft/client/render/entity/state/LivingEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;Lnet/minecraft/client/render/state/CameraRenderState;)V", at = @At("TAIL"))
     public void render(S livingEntityRenderState, MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, CameraRenderState cameraRenderState, CallbackInfo ci) {
-        if (mainLivingEntityThing != null && (RenderTracker.isInUUIDS(mainLivingEntityThing) || (Config.getOverrideAllFiltersEnabled() && !RenderTracker.isInvalid(mainLivingEntityThing)))) {
+        // Retrieve the entity from the map
+        LivingEntity livingEntity = ENTITY_MAP.get(livingEntityRenderState);
+        
+        if (livingEntity != null && (RenderTracker.isInUUIDS(livingEntity) || (Config.getOverrideAllFiltersEnabled() && !RenderTracker.isInvalid(livingEntity)))) {
             if(Config.getHeartsRenderingEnabled() || Config.getOverrideAllFiltersEnabled()) {
                 if (ModConfig.HANDLER.instance().indicator_type == HealthDisplayTypeEnum.HEARTS)
-                    renderHearts(mainLivingEntityThing, livingEntityRenderState.bodyYaw, 0, matrixStack, orderedRenderCommandQueue);
+                    renderHearts(livingEntity, livingEntityRenderState.bodyYaw, 0, matrixStack, orderedRenderCommandQueue);
                 else if (ModConfig.HANDLER.instance().indicator_type == HealthDisplayTypeEnum.NUMBER)
-                    renderNumber(mainLivingEntityThing, livingEntityRenderState.bodyYaw, 0, matrixStack, orderedRenderCommandQueue);
+                    renderNumber(livingEntity, livingEntityRenderState.bodyYaw, 0, matrixStack, orderedRenderCommandQueue);
                 else if (ModConfig.HANDLER.instance().indicator_type == HealthDisplayTypeEnum.DYNAMIC) {
-                    if (mainLivingEntityThing.getMaxHealth() > 100)
-                        renderNumber(mainLivingEntityThing, livingEntityRenderState.bodyYaw, 0, matrixStack, orderedRenderCommandQueue);
-                    else renderHearts(mainLivingEntityThing, livingEntityRenderState.bodyYaw, 0, matrixStack, orderedRenderCommandQueue);
+                    if (livingEntity.getMaxHealth() > 100)
+                        renderNumber(livingEntity, livingEntityRenderState.bodyYaw, 0, matrixStack, orderedRenderCommandQueue);
+                    else renderHearts(livingEntity, livingEntityRenderState.bodyYaw, 0, matrixStack, orderedRenderCommandQueue);
                 }
             }
-            if(Config.getArmorRenderingEnabled() || Config.getOverrideAllFiltersEnabled()) renderArmorPoints(mainLivingEntityThing, livingEntityRenderState.bodyYaw, 0, matrixStack, orderedRenderCommandQueue);
+            if(Config.getArmorRenderingEnabled() || Config.getOverrideAllFiltersEnabled()) renderArmorPoints(livingEntity, livingEntityRenderState.bodyYaw, 0, matrixStack, orderedRenderCommandQueue);
         }
     }
     @SuppressWarnings("unchecked")
@@ -125,18 +132,16 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
                     // Get vertex consumer for this specific texture with appropriate render layer
                     RenderLayer renderLayer;
                     if (isObstructed) {
-                        // Use a render layer that ignores depth testing when show_through_walls is enabled and view is obstructed
+                        // See through walls
                         renderLayer = RenderLayer.getTextSeeThrough(heartTextureId);
                     } else {
                         // Use normal text render layer
                         renderLayer = RenderLayer.getText(heartTextureId);
                     }
-                    // Submit a custom render command that will be executed in the proper batch
                     final HeartTypeEnum renderType = type;
                     float opacity = ModConfig.HANDLER.instance().health_bar_opacity / 100.0F;
                         orderedRenderCommandQueue.submitCustom(matrixStack, renderLayer, (matricesEntry, vertexConsumer) -> {
                             Matrix4f m = matricesEntry.getPositionMatrix();
-                            // Use RenderUtils helper which draws a heart quad using the provided vertexConsumer
                             RenderUtils.drawHeart(m, vertexConsumer, x, renderType, livingEntity, opacity);
                         });
                 } else {
@@ -163,13 +168,10 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
                         Identifier heartTextureId = ModConfig.HANDLER.instance().use_vanilla_textures ?
                                 Identifier.of("healthindicators", "textures/gui/heart/" + additionalIconEffects + type.icon + ".png") :
                                 Identifier.of("minecraft", "textures/gui/sprites/hud/heart/" + additionalIconEffects + type.icon + ".png");
-                        // Get vertex consumer for this specific texture with appropriate render layer
                         RenderLayer renderLayer;
                         if (isObstructed) {
-                            // Use a render layer that ignores depth testing when view is obstructed
                             renderLayer = RenderLayer.getTextSeeThrough(heartTextureId);
                         } else {
-                            // Use normal text render layer
                             renderLayer = RenderLayer.getText(heartTextureId);
                         }
                         final HeartTypeEnum renderType = type;
@@ -190,7 +192,6 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
         double d = this.dispatcher.getSquaredDistanceToCamera(livingEntity);
         final T entAsT = (T) livingEntity;
         String healthText = RenderUtils.getHealthText(livingEntity);
-        // Check if entity is obstructed by blocks
         boolean isObstructed = ModConfig.HANDLER.instance().show_through_walls;
         matrixStack.push();
         float scale = ModConfig.HANDLER.instance().size;
@@ -208,16 +209,15 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
         matrixStack.translate(0, -ModConfig.HANDLER.instance().display_offset, 0);
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
         float x = -textRenderer.getWidth(healthText) / 2.0f;
-    // Use a different text layer type when show_through_walls is enabled and entity is obstructed
     TextRenderer.TextLayerType textLayerType = isObstructed ?
         TextRenderer.TextLayerType.SEE_THROUGH : TextRenderer.TextLayerType.NORMAL;
     int backgroundColor = ModConfig.HANDLER.instance().render_number_display_background_color ?
         ModConfig.HANDLER.instance().number_display_background_color.getRGB() : 0;
-    // Apply opacity based on health_bar_opacity
+
     int textColor = ModConfig.HANDLER.instance().number_color.getRGB();
     int opacity = ModConfig.HANDLER.instance().health_bar_opacity;
     textColor = (textColor & 0x00FFFFFF) | ((opacity * 255 / 100) << 24);
-    // Submit the text to the ordered render queue (use fullbright light as before)
+
     orderedRenderCommandQueue.submitText(
         matrixStack,
         x,
@@ -274,13 +274,13 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
                 // Only proceed with rendering if we have a valid type
                 if (type != null) {
                     Identifier armorTextureId = type.icon;
-                    // Get vertex consumer for this specific texture with appropriate render layer
+
                     RenderLayer renderLayer;
                     if (isObstructed) {
-                        // Use a render layer that ignores depth testing when show_through_walls is enabled and view is obstructed
+
                         renderLayer = RenderLayer.getTextSeeThrough(armorTextureId);
                     } else {
-                        // Use normal text render layer
+
                         renderLayer = RenderLayer.getText(armorTextureId);
                     }
                     final ArmorTypeEnum renderType = type;
