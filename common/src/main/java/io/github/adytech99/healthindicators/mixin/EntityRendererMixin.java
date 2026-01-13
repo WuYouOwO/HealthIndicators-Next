@@ -48,14 +48,14 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
     protected EntityRendererMixin(EntityRendererFactory.Context ctx) {
         super(ctx);
     }
-    @Inject(method = "updateRenderState(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/render/entity/state/LivingEntityRenderState;F)V", at = @At("TAIL"))
+    @Inject(method = "updateRenderState(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/render/entity/state/LivingEntityRenderState;F)V", at = @At("TAIL"), remap = false)
     public void updateRenderState(T livingEntity, S livingEntityRenderState, float f, CallbackInfo ci){
         // Store the entity in a WeakHashMap keyed by the render state
         // This prevents the health sharing bug where entities of the same type show the same health
         // Using WeakHashMap ensures render states are garbage collected when no longer needed
         ENTITY_MAP.put(livingEntityRenderState, livingEntity);
     }
-    @Inject(method = "render(Lnet/minecraft/client/render/entity/state/LivingEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;Lnet/minecraft/client/render/state/CameraRenderState;)V", at = @At("TAIL"))
+    @Inject(method = "render(Lnet/minecraft/client/render/entity/state/LivingEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;Lnet/minecraft/client/render/state/CameraRenderState;)V", at = @At("TAIL"), remap = false)
     public void render(S livingEntityRenderState, MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, CameraRenderState cameraRenderState, CallbackInfo ci) {
         // Retrieve the entity from the map
         LivingEntity livingEntity = ENTITY_MAP.get(livingEntityRenderState);
@@ -100,11 +100,11 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
         double heartDensity = 50F - (Math.max(4F - Math.ceil((double) heartsTotal / heartsPerRow), -3F) * 5F);
         double h = 0;
         // Check if entity is obstructed by blocks
-        boolean isObstructed = ModConfig.HANDLER.instance().show_through_walls; // && isEntityObstructedByBlocks(livingEntity);
+        boolean shouldRenderThroughWalls = ModConfig.HANDLER.instance().show_through_walls && RenderTracker.isOkayToRenderThroughWalls(livingEntity); // && isEntityObstructedByBlocks(livingEntity);
         for (int isDrawingEmpty = 0; isDrawingEmpty < 2; isDrawingEmpty++) {
             //   Order 1: Empty hearts (background)
             //   Order 2: Filled hearts (foreground)
-            RenderCommandQueue targetQueue = isObstructed ? 
+            RenderCommandQueue targetQueue = shouldRenderThroughWalls ? 
                 orderedRenderCommandQueue.getBatchingQueue(isDrawingEmpty) : 
                 orderedRenderCommandQueue;
             
@@ -140,18 +140,18 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
                             Identifier.of("minecraft", "textures/gui/sprites/hud/heart/" + additionalIconEffects + type.icon + ".png");
                     // Get vertex consumer for this specific texture with appropriate render layer
                     RenderLayer renderLayer;
-                    if (isObstructed) {
+                    if (shouldRenderThroughWalls) {
                         // Use see-through render layer
-                        renderLayer = RenderLayer.getTextSeeThrough(heartTextureId);
+                        renderLayer = RenderLayers.textSeeThrough(heartTextureId);
                     } else {
                         // Use normal text render layer
-                        renderLayer = RenderLayer.getText(heartTextureId);
+                        renderLayer = RenderLayers.text(heartTextureId);
                     }
                     final HeartTypeEnum renderType = type;
                     float opacity = ModConfig.HANDLER.instance().health_bar_opacity / 100.0F;
                         targetQueue.submitCustom(matrixStack, renderLayer, (matricesEntry, vertexConsumer) -> {
                             Matrix4f m = matricesEntry.getPositionMatrix();
-                            RenderUtils.drawHeart(m, vertexConsumer, x, renderType, livingEntity, opacity, d, isObstructed);
+                            RenderUtils.drawHeart(m, vertexConsumer, x, renderType, livingEntity, opacity, d, shouldRenderThroughWalls);
                         });
                 } else {
                     HeartTypeEnum type;
@@ -178,16 +178,16 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
                                 Identifier.of("healthindicators", "textures/gui/heart/" + additionalIconEffects + type.icon + ".png") :
                                 Identifier.of("minecraft", "textures/gui/sprites/hud/heart/" + additionalIconEffects + type.icon + ".png");
                         RenderLayer renderLayer;
-                        if (isObstructed) {
-                            renderLayer = RenderLayer.getTextSeeThrough(heartTextureId);
+                        if (shouldRenderThroughWalls) {
+                            renderLayer = RenderLayers.textSeeThrough(heartTextureId);
                         } else {
-                            renderLayer = RenderLayer.getText(heartTextureId);
+                            renderLayer = RenderLayers.text(heartTextureId);
                         }
                         final HeartTypeEnum renderType = type;
                         float opacity = ModConfig.HANDLER.instance().health_bar_opacity / 100.0F;
                         targetQueue.submitCustom(matrixStack, renderLayer, (matricesEntry, vertexConsumer) -> {
                             Matrix4f m = matricesEntry.getPositionMatrix();
-                            RenderUtils.drawHeart(m, vertexConsumer, x, renderType, livingEntity, opacity, d, isObstructed);
+                            RenderUtils.drawHeart(m, vertexConsumer, x, renderType, livingEntity, opacity, d, shouldRenderThroughWalls);
                         });
                     }
                 }
@@ -201,7 +201,7 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
         double d = this.dispatcher.getSquaredDistanceToCamera(livingEntity);
         final T entAsT = (T) livingEntity;
         String healthText = RenderUtils.getHealthText(livingEntity);
-        boolean isObstructed = ModConfig.HANDLER.instance().show_through_walls;
+        boolean shouldRenderThroughWalls = ModConfig.HANDLER.instance().show_through_walls && RenderTracker.isOkayToRenderThroughWalls(livingEntity);
         matrixStack.push();
         float scale = ModConfig.HANDLER.instance().size;
         matrixStack.translate(0, livingEntity.getHeight() + 0.5f, 0);
@@ -218,7 +218,7 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
         matrixStack.translate(0, -ModConfig.HANDLER.instance().display_offset, 0);
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
         float x = -textRenderer.getWidth(healthText) / 2.0f;
-    TextRenderer.TextLayerType textLayerType = isObstructed ?
+    TextRenderer.TextLayerType textLayerType = shouldRenderThroughWalls ?
         TextRenderer.TextLayerType.SEE_THROUGH : TextRenderer.TextLayerType.NORMAL;
     int backgroundColor = ModConfig.HANDLER.instance().render_number_display_background_color ?
         ModConfig.HANDLER.instance().number_display_background_color.getRGB() : 0;
@@ -256,12 +256,12 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
         float maxX = pixelsTotal / 2.0f;
         float scale = ModConfig.HANDLER.instance().size;
         // Check if entity is obstructed by blocks
-        boolean isObstructed = ModConfig.HANDLER.instance().show_through_walls;
+        boolean shouldRenderThroughWalls = ModConfig.HANDLER.instance().show_through_walls && RenderTracker.isOkayToRenderThroughWalls(livingEntity);
     double h = 0;
         
         for (int isDrawingEmpty = 0; isDrawingEmpty < 2; isDrawingEmpty++) {
             // Again, switch to batching queues for see-through mode
-            RenderCommandQueue targetQueue = isObstructed ? 
+            RenderCommandQueue targetQueue = shouldRenderThroughWalls ? 
                 orderedRenderCommandQueue.getBatchingQueue(isDrawingEmpty + 2) : 
                 orderedRenderCommandQueue;
             
@@ -289,18 +289,19 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
                     Identifier armorTextureId = type.icon;
 
                     RenderLayer renderLayer;
-                    if (isObstructed) {
+                    if (shouldRenderThroughWalls) {
                         // Use see-through render layer
-                        renderLayer = RenderLayer.getTextSeeThrough(armorTextureId);
+                        //renderLayer = RenderLayer.getTextSeeThrough(armorTextureId);
+                        renderLayer = RenderLayers.textSeeThrough(armorTextureId);
                     } else {
                         // Use normal text render layer
-                        renderLayer = RenderLayer.getText(armorTextureId);
+                        renderLayer = RenderLayers.text(armorTextureId);
                     }
                     final ArmorTypeEnum renderType = type;
                     float opacity = ModConfig.HANDLER.instance().health_bar_opacity / 100.0F;
                     targetQueue.submitCustom(matrixStack, renderLayer, (matricesEntry, vertexConsumer) -> {
                         Matrix4f m = matricesEntry.getPositionMatrix();
-                        RenderUtils.drawArmor(m, vertexConsumer, x, renderType, opacity, d, isObstructed);
+                        RenderUtils.drawArmor(m, vertexConsumer, x, renderType, opacity, d, shouldRenderThroughWalls);
                     });
                 }
                 matrixStack.pop();

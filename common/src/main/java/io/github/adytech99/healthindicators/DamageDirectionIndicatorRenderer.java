@@ -46,12 +46,7 @@ public class DamageDirectionIndicatorRenderer {
             // Get screen center and setup parameters
             int centerX = drawContext.getScaledWindowWidth() / 2;
             int centerY = drawContext.getScaledWindowHeight() / 2;
-            float radius = 24.0f;
             float angle = (float) Math.toRadians(deltaYaw);
-
-            // Calculate indicator position
-            float indicatorX = centerX + radius * (float) Math.sin(angle);
-            float indicatorY = centerY - radius * (float) Math.cos(angle);
 
             // Calculate fade-out alpha (0-255)
             int alpha = 255;
@@ -65,36 +60,121 @@ public class DamageDirectionIndicatorRenderer {
 
             float scale = ModConfig.HANDLER.instance().damage_direction_indicators_scale;
             Color color = ModConfig.HANDLER.instance().damage_direction_indicators_color;
-            int argb = (alpha << 24) | (color.getRed() << 16) | (color.getGreen() << 8) | color.getBlue();
 
-            // Define triangle vertices in model space (pointing upwards)
-            float x1 = -3 * scale;
-            float y1 = 4 * scale;
-            float x2 = 3 * scale;
-            float y2 = 4 * scale;
-            float x3 = 0;
-            float y3 = -4 * scale;
-
-            // Compute sin and cos for rotation
-            float sin = MathHelper.sin(angle);
-            float cos = MathHelper.cos(angle);
-
-            // Rotate and translate each vertex
-            float v1x = x1 * cos - y1 * sin + indicatorX;
-            float v1y = x1 * sin + y1 * cos + indicatorY;
-            float v2x = x2 * cos - y2 * sin + indicatorX;
-            float v2y = x2 * sin + y2 * cos + indicatorY;
-            float v3x = x3 * cos - y3 * sin + indicatorX;
-            float v3y = x3 * sin + y3 * cos + indicatorY;
-
-            // Sort vertices by Y coordinate
-            float[] xs = {v1x, v2x, v3x};
-            float[] ys = {v1y, v2y, v3y};
-            sortVerticesByY(xs, ys);
-
-            // Draw filled triangle using scanline algorithm
-            drawTriangle(drawContext, xs, ys, argb);
+            // Draw the curved arc indicator
+            drawArcIndicator(drawContext, centerX, centerY, angle, scale, color, alpha);
         }
+    }
+
+    private static void drawArcIndicator(DrawContext context, int centerX, int centerY, float directionAngle, float scale, Color color, int alpha) {
+        // Parameters for the curved arc indicator
+        // radians
+        float radius = 28.0f * scale; // Distance from center
+        float arcSpan = 50.0f; // Arc width in degrees
+        float thickness = 1.6f * scale; // Thickness of the arc
+        int segments = 20; // Number of segments for smooth curve
+
+        // Create color with alpha for main arc
+        int mainColor = (alpha << 24) | (color.getRed() << 16) | (color.getGreen() << 8) | color.getBlue();
+
+        // Create slightly darker color for outer edge (subtle depth effect)
+        int darkerAlpha = (int)(alpha * 0.25f);
+        int darkerColor = (darkerAlpha << 24) | ((color.getRed() * 2 / 3) << 16) | ((color.getGreen() * 2 / 3) << 8) | (color.getBlue() * 2 / 3);
+
+        // Draw the main arc as a series of connected quads
+        for (int i = 0; i < segments; i++) {
+            float t1 = (float)i / segments;
+            float t2 = (float)(i + 1) / segments;
+
+            // Calculate angles for this segment (centered on direction angle)
+            float angle1 = directionAngle - (float)Math.toRadians(arcSpan / 2.0f) + (float)Math.toRadians(arcSpan * t1);
+            float angle2 = directionAngle - (float)Math.toRadians(arcSpan / 2.0f) + (float)Math.toRadians(arcSpan * t2);
+
+            // Inner arc points
+            float x1Inner = centerX + radius * MathHelper.sin(angle1);
+            float y1Inner = centerY - radius * MathHelper.cos(angle1);
+            float x2Inner = centerX + radius * MathHelper.sin(angle2);
+            float y2Inner = centerY - radius * MathHelper.cos(angle2);
+
+            // Outer arc points
+            float x1Outer = centerX + (radius + thickness) * MathHelper.sin(angle1);
+            float y1Outer = centerY - (radius + thickness) * MathHelper.cos(angle1);
+            float x2Outer = centerX + (radius + thickness) * MathHelper.sin(angle2);
+            float y2Outer = centerY - (radius + thickness) * MathHelper.cos(angle2);
+
+            // Draw quad for this segment
+            drawQuad(context, x1Inner, y1Inner, x2Inner, y2Inner, x2Outer, y2Outer, x1Outer, y1Outer, mainColor);
+        }
+
+        // Draw subtle glow/shadow on outer edge for depth
+        for (int i = 0; i < segments; i++) {
+            float t1 = (float)i / segments;
+            float t2 = (float)(i + 1) / segments;
+
+            float angle1 = directionAngle - (float)Math.toRadians(arcSpan / 2.0f) + (float)Math.toRadians(arcSpan * t1);
+            float angle2 = directionAngle - (float)Math.toRadians(arcSpan / 2.0f) + (float)Math.toRadians(arcSpan * t2);
+
+            float x1 = centerX + (radius + thickness) * MathHelper.sin(angle1);
+            float y1 = centerY - (radius + thickness) * MathHelper.cos(angle1);
+            float x2 = centerX + (radius + thickness) * MathHelper.sin(angle2);
+            float y2 = centerY - (radius + thickness) * MathHelper.cos(angle2);
+
+            float x1Outer = centerX + (radius + thickness + 1.0f * scale) * MathHelper.sin(angle1);
+            float y1Outer = centerY - (radius + thickness + 1.0f * scale) * MathHelper.cos(angle1);
+            float x2Outer = centerX + (radius + thickness + 1.0f * scale) * MathHelper.sin(angle2);
+            float y2Outer = centerY - (radius + thickness + 1.0f * scale) * MathHelper.cos(angle2);
+
+            drawQuad(context, x1, y1, x2, y2, x2Outer, y2Outer, x1Outer, y1Outer, darkerColor);
+        }
+
+        // Draw arrow pointer at the center of the arc pointing inward
+        drawArrowPointer(context, centerX, centerY, directionAngle, radius, scale, color, alpha);
+    }
+
+    private static void drawArrowPointer(DrawContext context, int centerX, int centerY, float directionAngle, float radius, float scale, Color color, int alpha) {
+        // Arrow dimensions
+        float arrowLength = 6.0f * scale;
+        float arrowWidth = 4.5f * scale;
+
+        // Position arrow at outer edge of arc
+        float arrowBaseX = centerX + radius * MathHelper.sin(directionAngle);
+        float arrowBaseY = centerY - radius * MathHelper.cos(directionAngle);
+
+        // Calculate arrow tip pointing OUTWARD (away from center)
+        float arrowTipX = centerX + (radius + arrowLength) * MathHelper.sin(directionAngle);
+        float arrowTipY = centerY - (radius + arrowLength) * MathHelper.cos(directionAngle);
+
+        // Calculate perpendicular angle for arrow wings
+        float perpAngle = directionAngle + (float)Math.PI / 2.0f;
+
+        // Arrow wing points
+        float leftWingX = arrowBaseX + arrowWidth * MathHelper.sin(perpAngle);
+        float leftWingY = arrowBaseY - arrowWidth * MathHelper.cos(perpAngle);
+        float rightWingX = arrowBaseX - arrowWidth * MathHelper.sin(perpAngle);
+        float rightWingY = arrowBaseY + arrowWidth * MathHelper.cos(perpAngle);
+
+        // Create color with alpha
+        int arrowColor = (alpha << 24) | (color.getRed() << 16) | (color.getGreen() << 8) | color.getBlue();
+
+        // Draw arrow as a triangle
+        float[] xs = {arrowTipX, leftWingX, rightWingX};
+        float[] ys = {arrowTipY, leftWingY, rightWingY};
+        sortVerticesByY(xs, ys);
+        drawTriangle(context, xs, ys, arrowColor);
+    }
+
+    private static void drawQuad(DrawContext context, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, int color) {
+        // Draw quad as two triangles
+        float[] tri1X = {x1, x2, x3};
+        float[] tri1Y = {y1, y2, y3};
+        float[] tri2X = {x1, x3, x4};
+        float[] tri2Y = {y1, y3, y4};
+
+        sortVerticesByY(tri1X, tri1Y);
+        drawTriangle(context, tri1X, tri1Y, color);
+
+        sortVerticesByY(tri2X, tri2Y);
+        drawTriangle(context, tri2X, tri2Y, color);
     }
 
     // Helper: Sort vertices by Y coordinate (ascending)

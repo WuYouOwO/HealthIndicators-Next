@@ -32,7 +32,8 @@ public class RenderUtils {
         float z = 0F;
         if (!isObstructed) {
             float baseOffset = 0.01F;
-            float distanceScale = 1.0F + (float)(Math.sqrt(squaredDistance) * 0.001F);
+            //float distanceScale = 1.0F + (float)(Math.sqrt(squaredDistance) * 0.001F);
+            float distanceScale = 1.0F + (float)(Math.sqrt(squaredDistance) * 1F);
             float scaledOffset = baseOffset * distanceScale;
             z = (type == HeartTypeEnum.EMPTY) ? -scaledOffset : scaledOffset;
         }

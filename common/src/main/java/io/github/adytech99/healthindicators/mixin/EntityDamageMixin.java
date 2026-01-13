@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(LivingEntity.class)
+@Mixin(value = LivingEntity.class, remap = false)
 public class EntityDamageMixin {
     @Inject(method = "onDamaged(Lnet/minecraft/entity/damage/DamageSource;)V", at = @At("TAIL"))
     private void onEntityDamage(DamageSource damageSource, CallbackInfo callbackInfo) {
