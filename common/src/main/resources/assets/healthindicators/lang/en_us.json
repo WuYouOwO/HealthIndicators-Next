@@ -55,12 +55,15 @@
 
   "yacl3.config.healthindicators:config.override_players": "Always show player health",
   "yacl3.config.healthindicators:config.override_players.desc": "Overrides the above options to always display health of Players, even if they have not been attacked, they are full health or they are not on crosshair",
-  "yacl3.config.healthindicators:config.override_players_label.desc": "Overrides above criteria and always renders health for the below entity types. \n \n Currently only the playerentity type is supported here.",
+  "yacl3.config.healthindicators:config.override_players_label.desc": "Overrides above criteria and always renders health for the below entity types. \n \n Currently only the PlayerEntity type is supported here.",
 
 
 
   "yacl3.config.healthindicators:config.indicator_type": "Indicator Type",
   "yacl3.config.healthindicators:config.indicator_type.desc": "Whether to render a floating hearts display or a number display. Settings this to 'dynamic' will render hearts for entities with less than 100 health, and numbers for entities with more than 100 health.",
+
+  "yacl3.config.healthindicators:config.dynamic_health_threshold": "Dynamic Health Threshold",
+  "yacl3.config.healthindicators:config.dynamic_health_threshold.desc": "Sets the threshold at which the indicator should switch to numbers from hearts, if Dynamic indicator type is selected",
 
   "yacl3.config.healthindicators:config.icons_per_row": "Hearts per row (beta)",
 
@@ -152,7 +155,7 @@
   "yacl3.config.healthindicators:config.category.messages.group.commands": "Mod Commands",
 
 
-  "key.categories.healthindicators": "Health Indicators",
+  "key.categories.healthindicators.main": "Health Indicators",
   "key.healthindicators.renderingEnabled": "Toggle Rendering",
   "key.healthindicators.armorRenderingEnabled": "Toggle Armor Points Rendering",
   "key.healthindicators.overrideAllFilters": "Override all config filters",

@@ -119,7 +119,7 @@
   "yacl3.config.health-indicators:config.category.messages.group.messages_appearance": "Сообщения мода",
   "yacl3.config.health-indicators:config.category.messages.group.commands": "Команды мода",
 
-  "key.categories.healthindicators": "Индикаторы здоровья",
+  "key.categories.healthindicators.main": "Индикаторы здоровья",
   "key.healthindicators.renderingEnabled": "Переключить отображение",
   "key.healthindicators.armorRenderingEnabled": "Переключить отображение брони",
   "key.healthindicators.overrideAllFilters": "Отменить все конфигурационные фильтры",

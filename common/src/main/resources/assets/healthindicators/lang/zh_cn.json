@@ -61,6 +61,9 @@
   
     "yacl3.config.healthindicators:config.indicator_type": "血条指示器类型",
     "yacl3.config.healthindicators:config.indicator_type.desc": "选择渲染浮动心形还是数字显示。设置为“动态”时，生命值小于 100 的实体使用心形，大于 100 的实体使用数字。",
+
+    "yacl3.config.healthindicators:config.dynamic_health_threshold": "Dynamic Health Threshold",
+    "yacl3.config.healthindicators:config.dynamic_health_threshold.desc": "Sets the threshold at which the indicator should switch to numbers from hearts, if Dynamic indicator type is selected",
   
     "yacl3.config.healthindicators:config.icons_per_row": "每行心形数量 (Beta)",
   
@@ -152,7 +155,7 @@
     "yacl3.config.healthindicators:config.category.messages.group.commands": "模组指令",
   
   
-    "key.categories.healthindicators": "血条指示器",
+    "key.categories.healthindicators.main": "血条指示器",
     "key.healthindicators.renderingEnabled": "切换渲染",
     "key.healthindicators.armorRenderingEnabled": "切换护甲条渲染",
     "key.healthindicators.overrideAllFilters": "覆盖所有过滤条件",

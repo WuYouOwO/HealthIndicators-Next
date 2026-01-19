@@ -41,10 +41,10 @@
   ],
 
   "depends": {
-    "fabricloader": ">=0.16.10",
+    "fabricloader": ">=0.17.2",
     "fabric": "*",
     "minecraft": ">=1.21.11",
-    "architectury": ">=16.1.4",
+    "architectury": ">=19.0.1",
     "yet_another_config_lib_v3": "*",
     "java": ">=21"
   }

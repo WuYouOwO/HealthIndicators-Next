@@ -67,7 +67,7 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
                 else if (ModConfig.HANDLER.instance().indicator_type == HealthDisplayTypeEnum.NUMBER)
                     renderNumber(livingEntity, livingEntityRenderState.bodyYaw, 0, matrixStack, orderedRenderCommandQueue);
                 else if (ModConfig.HANDLER.instance().indicator_type == HealthDisplayTypeEnum.DYNAMIC) {
-                    if (livingEntity.getMaxHealth() > 100)
+                    if (livingEntity.getMaxHealth() > ModConfig.HANDLER.instance().dynamic_health_threshold)
                         renderNumber(livingEntity, livingEntityRenderState.bodyYaw, 0, matrixStack, orderedRenderCommandQueue);
                     else renderHearts(livingEntity, livingEntityRenderState.bodyYaw, 0, matrixStack, orderedRenderCommandQueue);
                 }

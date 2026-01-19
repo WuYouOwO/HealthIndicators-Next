@@ -157,6 +157,11 @@ public class ModConfig {
     @EnumCycler
     public HealthDisplayTypeEnum indicator_type = HealthDisplayTypeEnum.HEARTS;
 
+    @SerialEntry
+    @AutoGen(category = "appearance", group = "indicator_type")
+    @IntSlider(min = 10, max = 200, step = 2)
+    public int dynamic_health_threshold = 100;
+
     @AutoGen(category = "appearance", group = "indicator_type")
     @Label
     private final Text heart_type_settings_label = Text.literal("Settings for the heart-type indicator");
