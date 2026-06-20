@@ -12,9 +12,9 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.KeyMapping;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.resources.ResourceLocation;
 
 import static io.github.adytech99.healthindicators.HealthIndicatorsCommon.HEALTH_INDICATORS_CATEGORY;
 
@@ -22,37 +22,37 @@ import static io.github.adytech99.healthindicators.HealthIndicatorsCommon.HEALTH
 public class HealthIndicatorsFabric implements ClientModInitializer {
     public static final String MOD_ID = HealthIndicatorsCommon.MOD_ID;
 
-    public static final KeyBinding HEARTS_RENDERING_ENABLED = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+    public static final KeyMapping HEARTS_RENDERING_ENABLED = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "key." + MOD_ID + ".renderingEnabled",
-            InputUtil.GLFW_KEY_LEFT,
+            InputConstants.KEY_LEFT,
             HEALTH_INDICATORS_CATEGORY
     ));
 
-    public static final KeyBinding ARMOR_RENDERING_ENABLED = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+    public static final KeyMapping ARMOR_RENDERING_ENABLED = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "key." + MOD_ID + ".armorRenderingEnabled",
-            InputUtil.GLFW_KEY_RIGHT_SHIFT,
+            InputConstants.KEY_RSHIFT,
             HEALTH_INDICATORS_CATEGORY
     ));
 
-    public static final KeyBinding OVERRIDE_ALL_FILTERS = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+    public static final KeyMapping OVERRIDE_ALL_FILTERS = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "key." + MOD_ID + ".overrideAllFilters",
-            InputUtil.GLFW_KEY_RIGHT,
+            InputConstants.KEY_RIGHT,
             HEALTH_INDICATORS_CATEGORY
     ));
-    public static final KeyBinding INCREASE_HEART_OFFSET = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+    public static final KeyMapping INCREASE_HEART_OFFSET = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "key." + MOD_ID + ".increaseHeartOffset",
-            InputUtil.GLFW_KEY_UP,
+            InputConstants.KEY_UP,
             HEALTH_INDICATORS_CATEGORY
     ));
-    public static final KeyBinding DECREASE_HEART_OFFSET = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+    public static final KeyMapping DECREASE_HEART_OFFSET = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "key." + MOD_ID + ".decreaseHeartOffset",
-            InputUtil.GLFW_KEY_DOWN,
+            InputConstants.KEY_DOWN,
             HEALTH_INDICATORS_CATEGORY
     ));
 
-    public static final KeyBinding OPEN_CONFIG_SCREEN = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+    public static final KeyMapping OPEN_CONFIG_SCREEN = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "key." + MOD_ID + ".openModMenuConfig",
-            InputUtil.GLFW_KEY_I,
+            InputConstants.KEY_I,
             HEALTH_INDICATORS_CATEGORY
     ));
 
@@ -64,29 +64,29 @@ public class HealthIndicatorsFabric implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             HealthIndicatorsCommon.tick();
 
-            while (HEARTS_RENDERING_ENABLED.wasPressed()) {
+            while (HEARTS_RENDERING_ENABLED.consumeClick()) {
                 HealthIndicatorsCommon.enableHeartsRendering();
             }
 
-            while (ARMOR_RENDERING_ENABLED.wasPressed()) {
+            while (ARMOR_RENDERING_ENABLED.consumeClick()) {
                 HealthIndicatorsCommon.enableArmorRendering();
             }
 
-            while (INCREASE_HEART_OFFSET.wasPressed()) {
+            while (INCREASE_HEART_OFFSET.consumeClick()) {
                 HealthIndicatorsCommon.increaseOffset();
             }
 
-            while (DECREASE_HEART_OFFSET.wasPressed()) {
+            while (DECREASE_HEART_OFFSET.consumeClick()) {
                 HealthIndicatorsCommon.decreaseOffset();
             }
-            if (OVERRIDE_ALL_FILTERS.isPressed()) {
+            if (OVERRIDE_ALL_FILTERS.isDown()) {
                 HealthIndicatorsCommon.overrideFilters();
             }
             else if(Config.getOverrideAllFiltersEnabled()) {
                 HealthIndicatorsCommon.disableOverrideFilters();
             }
 
-            if(OPEN_CONFIG_SCREEN.wasPressed()) HealthIndicatorsCommon.openConfigScreen();
+            if(OPEN_CONFIG_SCREEN.consumeClick()) HealthIndicatorsCommon.openConfigScreen();
         });
 
         ClientEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
