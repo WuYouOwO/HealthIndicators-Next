@@ -60,11 +60,27 @@ processResources {
     }
 }
 
-shadowJar {
-    configurations = [project.configurations.shadowBundle]
-    archiveClassifier = 'dev-shadow'
+// MC 26.2 is unobfuscated and all subprojects use loom-no-remap, so Loom does NOT
+// register a `remapJar` task. The shadowed jar is therefore the final production
+// artifact (mirrors the architectury-api 26.2 setup).
+jar {
+    archiveClassifier = 'dev'
 }
 
-remapJar {
-    input.set shadowJar.archiveFile
+shadowJar {
+    configurations = [project.configurations.shadowBundle]
+    archiveClassifier = null
+}
+
+assemble.dependsOn shadowJar
+
+configurations {
+    apiElements {
+        outgoing.artifacts.clear()
+        outgoing.artifact(shadowJar)
+    }
+    runtimeElements {
+        outgoing.artifacts.clear()
+        outgoing.artifact(shadowJar)
+    }
 }
