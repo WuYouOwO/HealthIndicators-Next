@@ -16,13 +16,15 @@ dependencies {
     // We depend on Fabric Loader here to use the Fabric @Environment annotations,
     // which get remapped to the correct annotations on each platform.
     // Do NOT use other classes from Fabric Loader.
-    modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+    // NOTE: MC 26.2 is unobfuscated and all subprojects use loom-no-remap, so Loom does NOT
+    // create the mod* remap configurations. Use plain implementation/api instead of modImplementation/modApi.
+    implementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
 
     // Architectury API. This is optional, and you can comment it out if you don't need it.
-    modImplementation "dev.architectury:architectury:$rootProject.architectury_api_version"
-    modImplementation "maven.modrinth:yacl:${project.yacl_fabric}"
+    implementation "dev.architectury:architectury:$rootProject.architectury_api_version"
+    implementation "maven.modrinth:yacl:${project.yacl_fabric}"
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-    modApi "com.terraformersmc:modmenu:${project.modmenu}"
+    api "com.terraformersmc:modmenu:${project.modmenu}"
 }
 
 loom {
