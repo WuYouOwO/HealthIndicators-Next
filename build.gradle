@@ -64,8 +64,11 @@ subprojects {
 
     dependencies {
         minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
-        // MC 26.2 is unobfuscated (Mojang removed obfuscation): no mappings layer is used.
-        // Loom auto-detects this and sets the production namespace to "official".
+        // MC 26.2 is unobfuscated (Mojang removed obfuscation), so the runtime names are
+        // already the official names. Loom still requires the 'mappings' configuration to
+        // have a dependency, so we declare the official Mojang mappings: this acts as an
+        // effectively identity mapping while satisfying Loom's setupMinecraft step.
+        mappings loom.officialMojangMappings()
         annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     }
