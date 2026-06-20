@@ -1,6 +1,6 @@
 plugins {
-    id 'dev.architectury.loom' version '1.17.483' apply false
-    id 'architectury-plugin' version '3.4-SNAPSHOT'
+    id 'dev.architectury.loom-no-remap' version '1.17.483' apply false
+    id 'architectury-plugin' version '3.5-SNAPSHOT'
     id 'com.gradleup.shadow' version '9.2.2' apply false
     id 'io.github.pacifistmc.forgix' version "1.2.9"
 }
@@ -31,14 +31,11 @@ allprojects {
 }
 
 subprojects {
-    // MC 26.2 is unobfuscated. NeoForge (Forge-like) requires the no-remap Loom plugin
-    // for unobfuscated Minecraft; the no-remap plugin applies the main Loom plugin itself.
-    // Fabric/common use the standard Loom plugin, which auto-detects the unobfuscated game.
-    if (project.name == 'neoforge') {
-        apply plugin: 'dev.architectury.loom-no-remap'
-    } else {
-        apply plugin: 'dev.architectury.loom'
-    }
+    // MC 26.2 is unobfuscated. The `loom-no-remap` plugin sets disable-obfuscation itself
+    // (via plugin detection), so Loom skips remapping and no `mappings` dependency is needed.
+    // In this mode Loom does NOT register a `remapJar` task; architectury-plugin 3.5+ handles
+    // its absence gracefully (findByName instead of getByName), so all subprojects can share it.
+    apply plugin: 'dev.architectury.loom-no-remap'
     apply plugin: 'architectury-plugin'
     apply plugin: 'maven-publish'
 
@@ -65,9 +62,8 @@ subprojects {
     dependencies {
         minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
         // MC 26.2 is unobfuscated (Mojang removed obfuscation), so the runtime names are
-        // already the official names and no mappings layer is used. Loom is told to skip
-        // obfuscation/remapping entirely via `fabric.loom.disableObfuscation=true` in
-        // gradle.properties, which makes the standard Loom plugin behave like loom-no-remap.
+        // already the official names and no mappings layer is declared. The loom-no-remap
+        // plugin makes Loom skip obfuscation/remapping entirely.
         annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     }
