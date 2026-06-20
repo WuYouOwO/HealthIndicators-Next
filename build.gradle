@@ -99,6 +99,10 @@ subprojects {
             // retrieving dependencies.
         }
     }
-    build.finalizedBy(mergeJars)
-    assemble.finalizedBy(mergeJars)
+    // NOTE: Forgix's mergeJars (combining fabric+neoforge into one "all platforms" jar) is disabled.
+    // Forgix 1.2.9 bundles an ASM that cannot read Java 25 class files (major version 69) and crashes
+    // with "Unsupported class file major version 69". The merged jar is only a convenience; install the
+    // per-platform jars instead (HealthIndicators-fabric-*.jar / HealthIndicators-neoforge-*.jar).
+    // build.finalizedBy(mergeJars)
+    // assemble.finalizedBy(mergeJars)
 }
