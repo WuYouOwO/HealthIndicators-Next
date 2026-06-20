@@ -1,0 +1,58 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: [26]
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          cache: gradle
+      
+      - name: Make gradlew Executable
+        run: chmod +x ./gradlew
+      
+      - name: Build with Gradle
+        run: ./gradlew build
+      
+      - name: Upload Build Artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: HealthIndicators-build-${{ matrix.java-version }}
+          path: |
+            build/libs/HealthIndicators-*.jar
+            fabric/build/libs/HealthIndicators-*.jar
+            neoforge/build/libs/HealthIndicators-*.jar
+          retention-days: 30
+      
+      - name: Publish Release Assets
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            build/libs/HealthIndicators-*.jar
+            fabric/build/libs/HealthIndicators-*.jar
+            neoforge/build/libs/HealthIndicators-*.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
