@@ -11,7 +11,7 @@ import io.github.adytech99.healthindicators.util.ConfigUtils;
 import io.github.adytech99.healthindicators.util.Util;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.commands.CommandBuildContext;
@@ -31,9 +31,9 @@ public class ModCommands {
 
 
     private static void configCommands(CommandDispatcher<FabricClientCommandSource> fabricClientCommandSourceCommandDispatcher, CommandBuildContext commandRegistryAccess) {
-        fabricClientCommandSourceCommandDispatcher.register(ClientCommandManager.literal("healthindicators")
-            .then(ClientCommandManager.literal("offset")
-                .then(ClientCommandManager.argument("offset", DoubleArgumentType.doubleArg())
+        fabricClientCommandSourceCommandDispatcher.register(ClientCommands.literal("healthindicators")
+            .then(ClientCommands.literal("offset")
+                .then(ClientCommands.argument("offset", DoubleArgumentType.doubleArg())
                     .executes(context -> {
                         ModConfig.HANDLER.instance().display_offset = DoubleArgumentType.getDouble(context, "offset");
                         ModConfig.HANDLER.save();
@@ -41,8 +41,8 @@ public class ModCommands {
                         return 1;
                     })))
 
-            .then(ClientCommandManager.literal("indicator-type")
-                .then(ClientCommandManager.argument("indicator_type", StringArgumentType.string())
+            .then(ClientCommands.literal("indicator-type")
+                .then(ClientCommands.argument("indicator_type", StringArgumentType.string())
                     .suggests((context, builder) -> {
                         builder.suggest("heart");
                         builder.suggest("number");
@@ -66,8 +66,8 @@ public class ModCommands {
                         })))
 
 
-            .then(ClientCommandManager.literal("monitor")
-                .then(ClientCommandManager.argument("entity_name", StringArgumentType.string())
+            .then(ClientCommands.literal("monitor")
+                .then(ClientCommands.argument("entity_name", StringArgumentType.string())
                         .suggests((context, builder) -> {
                             for(Entity entity : context.getSource().getWorld().entitiesForRendering()){
                                 if(entity.hasCustomName()) builder.suggest(Objects.requireNonNull(entity.getCustomName()).getString());
@@ -84,7 +84,7 @@ public class ModCommands {
                             return 0;
                         })))
 
-            .then(ClientCommandManager.literal("stop-monitoring")
+            .then(ClientCommands.literal("stop-monitoring")
                 .executes(context -> {
                     RenderTracker.setTrackedEntity(null);
                     ConfigUtils.sendMessage(context.getSource().getPlayer(), (Component.literal("Stopped monitoring ")));
@@ -94,13 +94,13 @@ public class ModCommands {
     }
 
     private static void IndicatorTypeCommand(CommandDispatcher<FabricClientCommandSource> fabricClientCommandSourceCommandDispatcher, CommandBuildContext commandRegistryAccess) {
-        fabricClientCommandSourceCommandDispatcher.register(ClientCommandManager.literal("healthindicators")
-                .then(ClientCommandManager.argument("operation", StringArgumentType.string())
+        fabricClientCommandSourceCommandDispatcher.register(ClientCommands.literal("healthindicators")
+                .then(ClientCommands.argument("operation", StringArgumentType.string())
                         .suggests((context, builder) -> {
                             builder.suggest("indicator_type");
                             return builder.buildFuture();
                         })
-                            .then(ClientCommandManager.argument("indicator_type", StringArgumentType.string())
+                            .then(ClientCommands.argument("indicator_type", StringArgumentType.string())
                                 .suggests((context, builder) -> {
                                     builder.suggest("heart");
                                     builder.suggest("number");
@@ -126,7 +126,7 @@ public class ModCommands {
     }
 
     private static void openModMenuCommand(CommandDispatcher<FabricClientCommandSource> fabricClientCommandSourceCommandDispatcher, CommandBuildContext commandRegistryAccess) {
-        fabricClientCommandSourceCommandDispatcher.register(ClientCommandManager.literal("healthindicators")
+        fabricClientCommandSourceCommandDispatcher.register(ClientCommands.literal("healthindicators")
             .executes(context -> {
                 HealthIndicatorsCommon.openConfig();
                 return 1;

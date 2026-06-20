@@ -11,7 +11,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.resources.Identifier;
@@ -22,35 +22,35 @@ import static io.github.adytech99.healthindicators.HealthIndicatorsCommon.HEALTH
 public class HealthIndicatorsFabric implements ClientModInitializer {
     public static final String MOD_ID = HealthIndicatorsCommon.MOD_ID;
 
-    public static final KeyMapping HEARTS_RENDERING_ENABLED = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+    public static final KeyMapping HEARTS_RENDERING_ENABLED = KeyMappingHelper.registerKeyMapping(new KeyMapping(
             "key." + MOD_ID + ".renderingEnabled",
             InputConstants.KEY_LEFT,
             HEALTH_INDICATORS_CATEGORY
     ));
 
-    public static final KeyMapping ARMOR_RENDERING_ENABLED = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+    public static final KeyMapping ARMOR_RENDERING_ENABLED = KeyMappingHelper.registerKeyMapping(new KeyMapping(
             "key." + MOD_ID + ".armorRenderingEnabled",
             InputConstants.KEY_RSHIFT,
             HEALTH_INDICATORS_CATEGORY
     ));
 
-    public static final KeyMapping OVERRIDE_ALL_FILTERS = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+    public static final KeyMapping OVERRIDE_ALL_FILTERS = KeyMappingHelper.registerKeyMapping(new KeyMapping(
             "key." + MOD_ID + ".overrideAllFilters",
             InputConstants.KEY_RIGHT,
             HEALTH_INDICATORS_CATEGORY
     ));
-    public static final KeyMapping INCREASE_HEART_OFFSET = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+    public static final KeyMapping INCREASE_HEART_OFFSET = KeyMappingHelper.registerKeyMapping(new KeyMapping(
             "key." + MOD_ID + ".increaseHeartOffset",
             InputConstants.KEY_UP,
             HEALTH_INDICATORS_CATEGORY
     ));
-    public static final KeyMapping DECREASE_HEART_OFFSET = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+    public static final KeyMapping DECREASE_HEART_OFFSET = KeyMappingHelper.registerKeyMapping(new KeyMapping(
             "key." + MOD_ID + ".decreaseHeartOffset",
             InputConstants.KEY_DOWN,
             HEALTH_INDICATORS_CATEGORY
     ));
 
-    public static final KeyMapping OPEN_CONFIG_SCREEN = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+    public static final KeyMapping OPEN_CONFIG_SCREEN = KeyMappingHelper.registerKeyMapping(new KeyMapping(
             "key." + MOD_ID + ".openModMenuConfig",
             InputConstants.KEY_I,
             HEALTH_INDICATORS_CATEGORY
