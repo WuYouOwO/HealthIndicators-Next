@@ -4,11 +4,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.adytech99.healthindicators.config.ModConfig;
 import io.github.adytech99.healthindicators.util.RenderUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 
 import java.awt.*;
@@ -116,7 +116,7 @@ public class HudRenderer {
     }*/
 
 
-    public static void onHudRender(GuiGraphics drawContext, DeltaTracker renderTickCounter){
+    public static void onHudRender(GuiGraphicsExtractor drawContext, DeltaTracker renderTickCounter){
         drawNumberHealthGUIIndicator(RenderTracker.getTrackedEntity(), ModConfig.HANDLER.instance().number_color, 20, 20, ModConfig.HANDLER.instance().render_number_display_shadow, drawContext);
     }
 
@@ -172,36 +172,36 @@ public class HudRenderer {
 
     }*/
 
-    private static void drawHeart(GuiGraphics context, HudHeartType type, int x, int y, boolean hardcore, boolean blinking, boolean half) {
+    private static void drawHeart(GuiGraphicsExtractor context, HudHeartType type, int x, int y, boolean hardcore, boolean blinking, boolean half) {
         //RenderSystem.enableBlend();
 //        context.drawGuiTexture(type.getTexture(hardcore, half, blinking), 50, 50, 9, 9);
         //RenderSystem.disableBlend();
     }
 
-    public static void drawNumberHealthGUIIndicator(LivingEntity livingEntity, Color textColor, int x, int y, boolean shadow, GuiGraphics drawContext){
+    public static void drawNumberHealthGUIIndicator(LivingEntity livingEntity, Color textColor, int x, int y, boolean shadow, GuiGraphicsExtractor drawContext){
         String name = String.valueOf(livingEntity.getCustomName() != null ? livingEntity.getCustomName().getString() : livingEntity.getDisplayName().getString());
         drawContext.drawString(Minecraft.getInstance().font, name, x, y, textColor.getRGB(), shadow);
         drawContext.drawString(Minecraft.getInstance().font, RenderUtils.getHealthText(livingEntity), x, y+10, textColor.getRGB(), shadow);
     }
 
     enum HudHeartType {
-        CONTAINER(ResourceLocation.withDefaultNamespace("hud/heart/container"), ResourceLocation.withDefaultNamespace("hud/heart/container_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/container"), ResourceLocation.withDefaultNamespace("hud/heart/container_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/container_hardcore"), ResourceLocation.withDefaultNamespace("hud/heart/container_hardcore_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/container_hardcore"), ResourceLocation.withDefaultNamespace("hud/heart/container_hardcore_blinking")),
-        NORMAL(ResourceLocation.withDefaultNamespace("hud/heart/full"), ResourceLocation.withDefaultNamespace("hud/heart/full_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/half"), ResourceLocation.withDefaultNamespace("hud/heart/half_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/hardcore_full"), ResourceLocation.withDefaultNamespace("hud/heart/hardcore_full_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/hardcore_half"), ResourceLocation.withDefaultNamespace("hud/heart/hardcore_half_blinking")),
-        POISONED(ResourceLocation.withDefaultNamespace("hud/heart/poisoned_full"), ResourceLocation.withDefaultNamespace("hud/heart/poisoned_full_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/poisoned_half"), ResourceLocation.withDefaultNamespace("hud/heart/poisoned_half_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/poisoned_hardcore_full"), ResourceLocation.withDefaultNamespace("hud/heart/poisoned_hardcore_full_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/poisoned_hardcore_half"), ResourceLocation.withDefaultNamespace("hud/heart/poisoned_hardcore_half_blinking")),
-        WITHERED(ResourceLocation.withDefaultNamespace("hud/heart/withered_full"), ResourceLocation.withDefaultNamespace("hud/heart/withered_full_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/withered_half"), ResourceLocation.withDefaultNamespace("hud/heart/withered_half_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/withered_hardcore_full"), ResourceLocation.withDefaultNamespace("hud/heart/withered_hardcore_full_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/withered_hardcore_half"), ResourceLocation.withDefaultNamespace("hud/heart/withered_hardcore_half_blinking")),
-        ABSORBING(ResourceLocation.withDefaultNamespace("hud/heart/absorbing_full"), ResourceLocation.withDefaultNamespace("hud/heart/absorbing_full_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/absorbing_half"), ResourceLocation.withDefaultNamespace("hud/heart/absorbing_half_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/absorbing_hardcore_full"), ResourceLocation.withDefaultNamespace("hud/heart/absorbing_hardcore_full_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/absorbing_hardcore_half"), ResourceLocation.withDefaultNamespace("hud/heart/absorbing_hardcore_half_blinking")),
-        FROZEN(ResourceLocation.withDefaultNamespace("hud/heart/frozen_full"), ResourceLocation.withDefaultNamespace("hud/heart/frozen_full_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/frozen_half"), ResourceLocation.withDefaultNamespace("hud/heart/frozen_half_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/frozen_hardcore_full"), ResourceLocation.withDefaultNamespace("hud/heart/frozen_hardcore_full_blinking"), ResourceLocation.withDefaultNamespace("hud/heart/frozen_hardcore_half"), ResourceLocation.withDefaultNamespace("hud/heart/frozen_hardcore_half_blinking"));
+        CONTAINER(Identifier.withDefaultNamespace("hud/heart/container"), Identifier.withDefaultNamespace("hud/heart/container_blinking"), Identifier.withDefaultNamespace("hud/heart/container"), Identifier.withDefaultNamespace("hud/heart/container_blinking"), Identifier.withDefaultNamespace("hud/heart/container_hardcore"), Identifier.withDefaultNamespace("hud/heart/container_hardcore_blinking"), Identifier.withDefaultNamespace("hud/heart/container_hardcore"), Identifier.withDefaultNamespace("hud/heart/container_hardcore_blinking")),
+        NORMAL(Identifier.withDefaultNamespace("hud/heart/full"), Identifier.withDefaultNamespace("hud/heart/full_blinking"), Identifier.withDefaultNamespace("hud/heart/half"), Identifier.withDefaultNamespace("hud/heart/half_blinking"), Identifier.withDefaultNamespace("hud/heart/hardcore_full"), Identifier.withDefaultNamespace("hud/heart/hardcore_full_blinking"), Identifier.withDefaultNamespace("hud/heart/hardcore_half"), Identifier.withDefaultNamespace("hud/heart/hardcore_half_blinking")),
+        POISONED(Identifier.withDefaultNamespace("hud/heart/poisoned_full"), Identifier.withDefaultNamespace("hud/heart/poisoned_full_blinking"), Identifier.withDefaultNamespace("hud/heart/poisoned_half"), Identifier.withDefaultNamespace("hud/heart/poisoned_half_blinking"), Identifier.withDefaultNamespace("hud/heart/poisoned_hardcore_full"), Identifier.withDefaultNamespace("hud/heart/poisoned_hardcore_full_blinking"), Identifier.withDefaultNamespace("hud/heart/poisoned_hardcore_half"), Identifier.withDefaultNamespace("hud/heart/poisoned_hardcore_half_blinking")),
+        WITHERED(Identifier.withDefaultNamespace("hud/heart/withered_full"), Identifier.withDefaultNamespace("hud/heart/withered_full_blinking"), Identifier.withDefaultNamespace("hud/heart/withered_half"), Identifier.withDefaultNamespace("hud/heart/withered_half_blinking"), Identifier.withDefaultNamespace("hud/heart/withered_hardcore_full"), Identifier.withDefaultNamespace("hud/heart/withered_hardcore_full_blinking"), Identifier.withDefaultNamespace("hud/heart/withered_hardcore_half"), Identifier.withDefaultNamespace("hud/heart/withered_hardcore_half_blinking")),
+        ABSORBING(Identifier.withDefaultNamespace("hud/heart/absorbing_full"), Identifier.withDefaultNamespace("hud/heart/absorbing_full_blinking"), Identifier.withDefaultNamespace("hud/heart/absorbing_half"), Identifier.withDefaultNamespace("hud/heart/absorbing_half_blinking"), Identifier.withDefaultNamespace("hud/heart/absorbing_hardcore_full"), Identifier.withDefaultNamespace("hud/heart/absorbing_hardcore_full_blinking"), Identifier.withDefaultNamespace("hud/heart/absorbing_hardcore_half"), Identifier.withDefaultNamespace("hud/heart/absorbing_hardcore_half_blinking")),
+        FROZEN(Identifier.withDefaultNamespace("hud/heart/frozen_full"), Identifier.withDefaultNamespace("hud/heart/frozen_full_blinking"), Identifier.withDefaultNamespace("hud/heart/frozen_half"), Identifier.withDefaultNamespace("hud/heart/frozen_half_blinking"), Identifier.withDefaultNamespace("hud/heart/frozen_hardcore_full"), Identifier.withDefaultNamespace("hud/heart/frozen_hardcore_full_blinking"), Identifier.withDefaultNamespace("hud/heart/frozen_hardcore_half"), Identifier.withDefaultNamespace("hud/heart/frozen_hardcore_half_blinking"));
 
-        private final ResourceLocation fullTexture;
-        private final ResourceLocation fullBlinkingTexture;
-        private final ResourceLocation halfTexture;
-        private final ResourceLocation halfBlinkingTexture;
-        private final ResourceLocation hardcoreFullTexture;
-        private final ResourceLocation hardcoreFullBlinkingTexture;
-        private final ResourceLocation hardcoreHalfTexture;
-        private final ResourceLocation hardcoreHalfBlinkingTexture;
+        private final Identifier fullTexture;
+        private final Identifier fullBlinkingTexture;
+        private final Identifier halfTexture;
+        private final Identifier halfBlinkingTexture;
+        private final Identifier hardcoreFullTexture;
+        private final Identifier hardcoreFullBlinkingTexture;
+        private final Identifier hardcoreHalfTexture;
+        private final Identifier hardcoreHalfBlinkingTexture;
 
-        HudHeartType(final ResourceLocation fullTexture, final ResourceLocation fullBlinkingTexture, final ResourceLocation halfTexture, final ResourceLocation halfBlinkingTexture, final ResourceLocation hardcoreFullTexture, final ResourceLocation hardcoreFullBlinkingTexture, final ResourceLocation hardcoreHalfTexture, final ResourceLocation hardcoreHalfBlinkingTexture) {
+        HudHeartType(final Identifier fullTexture, final Identifier fullBlinkingTexture, final Identifier halfTexture, final Identifier halfBlinkingTexture, final Identifier hardcoreFullTexture, final Identifier hardcoreFullBlinkingTexture, final Identifier hardcoreHalfTexture, final Identifier hardcoreHalfBlinkingTexture) {
             this.fullTexture = fullTexture;
             this.fullBlinkingTexture = fullBlinkingTexture;
             this.halfTexture = halfTexture;
@@ -212,7 +212,7 @@ public class HudRenderer {
             this.hardcoreHalfBlinkingTexture = hardcoreHalfBlinkingTexture;
         }
 
-        public ResourceLocation getTexture(boolean hardcore, boolean half, boolean blinking) {
+        public Identifier getTexture(boolean hardcore, boolean half, boolean blinking) {
             if (!hardcore) {
                 if (half) {
                     return blinking ? this.halfBlinkingTexture : this.halfTexture;

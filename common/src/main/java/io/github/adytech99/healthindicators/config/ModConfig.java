@@ -14,7 +14,7 @@ import io.github.adytech99.healthindicators.enums.MessageTypeEnum;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -25,7 +25,7 @@ public class ModConfig {
     public static final Path CONFIG_PATH = Platform.getConfigFolder().resolve("health_indicators_config.json");
 
     public static final ConfigClassHandler<ModConfig> HANDLER = ConfigClassHandler.createBuilder(ModConfig.class)
-            .id(ResourceLocation.fromNamespaceAndPath(HealthIndicatorsCommon.MOD_ID, "config"))
+            .id(Identifier.fromNamespaceAndPath(HealthIndicatorsCommon.MOD_ID, "config"))
             .serializer(config -> GsonConfigSerializerBuilder.create(config)
                     .setPath(CONFIG_PATH)
                     .build())

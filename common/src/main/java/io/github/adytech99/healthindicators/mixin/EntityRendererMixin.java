@@ -10,8 +10,8 @@ import io.github.adytech99.healthindicators.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypes;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -24,7 +24,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.scores.DisplaySlot;
 import org.joml.Matrix4f;
@@ -37,13 +37,13 @@ import static io.github.adytech99.healthindicators.enums.HeartTypeEnum.addHardco
 import static io.github.adytech99.healthindicators.enums.HeartTypeEnum.addStatusIcon;
 
 
-@Mixin(LivingEntityRenderer.class)
+@Mixin(value = LivingEntityRenderer.class, remap = false)
 public abstract class EntityRendererMixin<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>>
         extends EntityRenderer<T, S>
         implements RenderLayerParent<S, M> {
             
     @Unique private final Minecraft client = Minecraft.getInstance();
-    @Unique private static final ResourceLocation ICONS_TEXTURE = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/gui/icons.png");
+    @Unique private static final Identifier ICONS_TEXTURE = Identifier.fromNamespaceAndPath("minecraft", "textures/gui/icons.png");
     @Unique private static final java.util.WeakHashMap<LivingEntityRenderState, LivingEntity> ENTITY_MAP = new java.util.WeakHashMap<>();
     
     protected EntityRendererMixin(EntityRendererProvider.Context ctx) {
@@ -136,9 +136,9 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
                     // Create heart texture identifier
                     String additionalIconEffects = "";
                     HeartTypeEnum type = HeartTypeEnum.EMPTY;
-                    ResourceLocation heartTextureId = ModConfig.HANDLER.instance().use_vanilla_textures ?
-                            ResourceLocation.fromNamespaceAndPath("healthindicators", "textures/gui/heart/" + additionalIconEffects + type.icon + ".png") :
-                            ResourceLocation.fromNamespaceAndPath("minecraft", "textures/gui/sprites/hud/heart/" + additionalIconEffects + type.icon + ".png");
+                    Identifier heartTextureId = ModConfig.HANDLER.instance().use_vanilla_textures ?
+                            Identifier.fromNamespaceAndPath("healthindicators", "textures/gui/heart/" + additionalIconEffects + type.icon + ".png") :
+                            Identifier.fromNamespaceAndPath("minecraft", "textures/gui/sprites/hud/heart/" + additionalIconEffects + type.icon + ".png");
                     // Get vertex consumer for this specific texture with appropriate render layer
                     RenderType renderLayer;
                     if (shouldRenderThroughWalls) {
@@ -175,9 +175,9 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
                         if(type != HeartTypeEnum.YELLOW_FULL && type != HeartTypeEnum.YELLOW_HALF && type != HeartTypeEnum.EMPTY && ModConfig.HANDLER.instance().show_heart_effects) {
                             additionalIconEffects = (addStatusIcon(livingEntity) + addHardcoreIcon(livingEntity));
                         }
-                        ResourceLocation heartTextureId = ModConfig.HANDLER.instance().use_vanilla_textures ?
-                                ResourceLocation.fromNamespaceAndPath("healthindicators", "textures/gui/heart/" + additionalIconEffects + type.icon + ".png") :
-                                ResourceLocation.fromNamespaceAndPath("minecraft", "textures/gui/sprites/hud/heart/" + additionalIconEffects + type.icon + ".png");
+                        Identifier heartTextureId = ModConfig.HANDLER.instance().use_vanilla_textures ?
+                                Identifier.fromNamespaceAndPath("healthindicators", "textures/gui/heart/" + additionalIconEffects + type.icon + ".png") :
+                                Identifier.fromNamespaceAndPath("minecraft", "textures/gui/sprites/hud/heart/" + additionalIconEffects + type.icon + ".png");
                         RenderType renderLayer;
                         if (shouldRenderThroughWalls) {
                             renderLayer = RenderTypes.textSeeThrough(heartTextureId);
@@ -287,7 +287,7 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
                 float x = maxX - (pointCount % pointsPerRow) * 8;
                 ArmorTypeEnum type = (isDrawingEmpty == 0) ? ArmorTypeEnum.EMPTY : (pointCount < armorPoints ? ((pointCount == armorPoints - 1 && lastPointHalf) ? ArmorTypeEnum.HALF : ArmorTypeEnum.FULL) : null);
                 if (type != null) {
-                    ResourceLocation armorTextureId = type.icon;
+                    Identifier armorTextureId = type.icon;
 
                     RenderType renderLayer;
                     if (shouldRenderThroughWalls) {

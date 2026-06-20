@@ -6,13 +6,13 @@ import io.github.adytech99.healthindicators.config.ModConfig;
 import io.github.adytech99.healthindicators.util.ConfigUtils;
 import io.github.adytech99.healthindicators.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +20,7 @@ public final class HealthIndicatorsCommon {
     public static final String MOD_ID = "healthindicators";
     public static Minecraft client = Minecraft.getInstance();
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static final KeyMapping.Category HEALTH_INDICATORS_CATEGORY = KeyMapping.Category.create(ResourceLocation.fromNamespaceAndPath(MOD_ID, "main"));
+    public static final KeyMapping.Category HEALTH_INDICATORS_CATEGORY = KeyMapping.Category.create(Identifier.fromNamespaceAndPath(MOD_ID, "main"));
 
     private static boolean changed = false;
     private static boolean openConfig = false;
@@ -52,7 +52,7 @@ public final class HealthIndicatorsCommon {
         DamageDirectionIndicatorRenderer.tick();
     }
 
-    public static void onHudRender(GuiGraphics drawContext1, DeltaTracker renderTickCounter1) {
+    public static void onHudRender(GuiGraphicsExtractor drawContext1, DeltaTracker renderTickCounter1) {
         if(RenderTracker.getTrackedEntity() != null) HudRenderer.onHudRender(drawContext1, renderTickCounter1);
         if(ModConfig.HANDLER.instance().enable_damage_direction_indicators && client.hasSingleplayerServer()) DamageDirectionIndicatorRenderer.render(drawContext1, renderTickCounter1.getGameTimeDeltaPartialTick(false));
     }
