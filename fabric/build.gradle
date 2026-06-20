@@ -39,7 +39,7 @@ dependencies {
     api "com.terraformersmc:modmenu:${project.modmenu}"
     implementation "maven.modrinth:yacl:${project.yacl_fabric}"
 
-    common(project(path: ':common', configuration: 'namedElements')) { transitive false }
+    common(project(path: ':common')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
 }
 

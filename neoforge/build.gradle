@@ -48,7 +48,7 @@ dependencies {
     implementation "maven.modrinth:yacl:${project.yacl_neoforge}"
     implementation 'thedarkcolour:kotlinforforge-neoforge:5.6.0'
 
-    common(project(path: ':common', configuration: 'namedElements')) { transitive false }
+    common(project(path: ':common')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionNeoForge')
 }
 
