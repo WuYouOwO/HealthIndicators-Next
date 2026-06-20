@@ -10,21 +10,22 @@ public class ConfigUtils {
     public static void sendMessage(LocalPlayer player, Component text) {
         if (isSendMessage()) {
             boolean overlay = ModConfig.HANDLER.instance().message_type == MessageTypeEnum.ACTIONBAR;
-            player.displayClientMessage(text, overlay);
+            if (overlay) player.sendOverlayMessage(text);
+            else player.sendSystemMessage(text);
         }
     }
 
     public static void sendMessage(ServerPlayer player, Component text) {
         if (isSendMessage()) {
             boolean overlay = ModConfig.HANDLER.instance().message_type == MessageTypeEnum.ACTIONBAR;
-            player.displayClientMessage(text, overlay);
+            if (overlay) player.sendOverlayMessage(text);
+            else player.sendSystemMessage(text);
         }
     }
 
     public static void sendOverlayMessage(LocalPlayer player, Component text) {
         if (isSendMessage()) {
-            boolean overlay = ModConfig.HANDLER.instance().message_type == MessageTypeEnum.ACTIONBAR;
-            player.displayClientMessage(text, true);
+            player.sendOverlayMessage(text);
         }
     }
 

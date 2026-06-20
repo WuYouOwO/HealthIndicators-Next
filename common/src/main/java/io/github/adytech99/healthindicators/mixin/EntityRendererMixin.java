@@ -13,6 +13,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -105,7 +106,7 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
         for (int isDrawingEmpty = 0; isDrawingEmpty < 2; isDrawingEmpty++) {
             //   Order 1: Empty hearts (background)
             //   Order 2: Filled hearts (foreground)
-            SubmitNodeCollector targetQueue = shouldRenderThroughWalls ? 
+            OrderedSubmitNodeCollector targetQueue = shouldRenderThroughWalls ? 
                 orderedRenderCommandQueue.order(isDrawingEmpty) : 
                 orderedRenderCommandQueue;
             
@@ -262,7 +263,7 @@ public abstract class EntityRendererMixin<T extends LivingEntity, S extends Livi
         
         for (int isDrawingEmpty = 0; isDrawingEmpty < 2; isDrawingEmpty++) {
             // Again, switch to batching queues for see-through mode
-            SubmitNodeCollector targetQueue = shouldRenderThroughWalls ? 
+            OrderedSubmitNodeCollector targetQueue = shouldRenderThroughWalls ? 
                 orderedRenderCommandQueue.order(isDrawingEmpty + 2) : 
                 orderedRenderCommandQueue;
             

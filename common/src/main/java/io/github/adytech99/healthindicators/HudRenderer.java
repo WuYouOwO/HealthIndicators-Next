@@ -180,8 +180,8 @@ public class HudRenderer {
 
     public static void drawNumberHealthGUIIndicator(LivingEntity livingEntity, Color textColor, int x, int y, boolean shadow, GuiGraphicsExtractor drawContext){
         String name = String.valueOf(livingEntity.getCustomName() != null ? livingEntity.getCustomName().getString() : livingEntity.getDisplayName().getString());
-        drawContext.drawString(Minecraft.getInstance().font, name, x, y, textColor.getRGB(), shadow);
-        drawContext.drawString(Minecraft.getInstance().font, RenderUtils.getHealthText(livingEntity), x, y+10, textColor.getRGB(), shadow);
+        drawContext.text(Minecraft.getInstance().font, name, x, y, textColor.getRGB(), shadow);
+        drawContext.text(Minecraft.getInstance().font, RenderUtils.getHealthText(livingEntity), x, y+10, textColor.getRGB(), shadow);
     }
 
     enum HudHeartType {

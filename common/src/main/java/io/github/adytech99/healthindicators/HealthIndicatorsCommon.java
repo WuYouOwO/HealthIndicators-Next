@@ -20,7 +20,7 @@ public final class HealthIndicatorsCommon {
     public static final String MOD_ID = "healthindicators";
     public static Minecraft client = Minecraft.getInstance();
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static final KeyMapping.Category HEALTH_INDICATORS_CATEGORY = KeyMapping.Category.create(Identifier.fromNamespaceAndPath(MOD_ID, "main"));
+    public static final KeyMapping.Category HEALTH_INDICATORS_CATEGORY = new KeyMapping.Category(Identifier.fromNamespaceAndPath(MOD_ID, "main"));
 
     private static boolean changed = false;
     private static boolean openConfig = false;
@@ -36,8 +36,8 @@ public final class HealthIndicatorsCommon {
 
     public static void tick(){
         if(openConfig){
-            Screen configScreen = ModConfig.createScreen(client.screen);
-            client.setScreen(configScreen);
+            Screen configScreen = ModConfig.createScreen(client.gui.screen());
+            client.gui.setScreen(configScreen);
             openConfig = false;
         }
         if(client == null || client.level == null){
@@ -109,7 +109,7 @@ public final class HealthIndicatorsCommon {
 
     public static void disableOverrideFilters(){
         Config.setOverrideAllFiltersEnabled(false);
-        client.gui.setOverlayMessage(Component.literal(""), false);
+        client.gui.hud.setOverlayMessage(Component.literal(""), false);
     }
 
     public static void openConfigScreen(){

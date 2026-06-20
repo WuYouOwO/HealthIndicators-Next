@@ -22,7 +22,7 @@ public class DamageDirectionIndicatorRenderer {
     public static void tick(){
         player = HealthIndicatorsCommon.client.player;
         if(timeSinceLastDamage != Integer.MAX_VALUE) timeSinceLastDamage++;
-        if (attacker == null || attacker.isDead() || attacker.isRemoved()){
+        if (attacker == null || attacker.isDeadOrDying() || attacker.isRemoved()){
             timeSinceLastDamage = Integer.MAX_VALUE;
             attacker = null;
         }
