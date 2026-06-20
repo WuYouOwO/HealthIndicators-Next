@@ -69,16 +69,16 @@ public class ModCommands {
             .then(ClientCommands.literal("monitor")
                 .then(ClientCommands.argument("entity_name", StringArgumentType.string())
                         .suggests((context, builder) -> {
-                            for(Entity entity : context.getSource().getWorld().entitiesForRendering()){
+                            for(Entity entity : context.getSource().getLevel().entitiesForRendering()){
                                 if(entity.hasCustomName()) builder.suggest(Objects.requireNonNull(entity.getCustomName()).getString());
                                 if(entity instanceof Player) builder.suggest(Objects.requireNonNull(entity.getDisplayName()).getString());
                             }
                             return builder.buildFuture();
                         })
                         .executes(context -> {
-                            if(Util.getEntityFromName(context.getSource().getWorld(), StringArgumentType.getString(context, "entity_name")) != null) {
+                            if(Util.getEntityFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "entity_name")) != null) {
                                 ConfigUtils.sendMessage(context.getSource().getPlayer(), (Component.literal("Now monitoring " + StringArgumentType.getString(context, "entity_name"))));
-                                RenderTracker.setTrackedEntity((LivingEntity) Util.getEntityFromName(context.getSource().getWorld(), StringArgumentType.getString(context, "entity_name")));
+                                RenderTracker.setTrackedEntity((LivingEntity) Util.getEntityFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "entity_name")));
                             }
                             else ConfigUtils.sendMessage(context.getSource().getPlayer(), (Component.literal("There is no entity named " + StringArgumentType.getString(context, "entity_name") + " in the world. It may have died or gone out of render distance.")));
                             return 0;
