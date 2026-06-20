@@ -65,10 +65,9 @@ subprojects {
     dependencies {
         minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
         // MC 26.2 is unobfuscated (Mojang removed obfuscation), so the runtime names are
-        // already the official names. Loom still requires the 'mappings' configuration to
-        // have a dependency, so we declare the official Mojang mappings: this acts as an
-        // effectively identity mapping while satisfying Loom's setupMinecraft step.
-        mappings loom.officialMojangMappings()
+        // already the official names and no mappings layer is used. Loom is told to skip
+        // obfuscation/remapping entirely via `fabric.loom.disableObfuscation=true` in
+        // gradle.properties, which makes the standard Loom plugin behave like loom-no-remap.
         annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     }
