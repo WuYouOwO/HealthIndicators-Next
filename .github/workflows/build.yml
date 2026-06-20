@@ -31,9 +31,16 @@ jobs:
       
       - name: Make gradlew Executable
         run: chmod +x ./gradlew
-      
+
       - name: Build with Gradle
-        run: ./gradlew build --stacktrace --info
+        run: ./gradlew build --console=plain --no-daemon 2>&1 | tee build-output.log
+
+      - name: Show compile errors
+        if: failure()
+        run: |
+          echo "==================== COMPILE ERRORS ===================="
+          grep -E "error:|\.java:[0-9]+:" build-output.log || echo "No 'error:' lines found in build-output.log"
+          echo "========================================================"
       
       - name: Upload Build Artifacts
         if: success()
