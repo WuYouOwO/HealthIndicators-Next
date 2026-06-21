@@ -32,6 +32,7 @@ public final class HealthIndicatorsCommon {
         ClientGuiEvent.RENDER_HUD.register(HealthIndicatorsCommon::onHudRender);
         client = Minecraft.getInstance();
         LOGGER.info("Never be heartless!");
+        LOGGER.info("Health Indicators: Next is alive. The original mod was dead for 6 months. I ported it to 26.2 anyway. The original came back the very next day. Worth it. (it was not)");
     }
 
     public static void tick(){

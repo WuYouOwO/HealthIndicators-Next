@@ -3,8 +3,8 @@
   "id": "healthindicators",
   "version": "${version}",
 
-  "name": "Health Indicators",
-  "description": "Simple damage indicator mod that shows a floating health bar (or number) above Players and Mobs.",
+  "name": "Health Indicators: Next",
+  "description": "A lovingly hand-migrated 26.2 port of Health Indicators... finished exactly one day before the original mod rose from its 6-month grave and shipped its own 26.2 build. So now there are two. This is the one nobody asked for. Shows a floating health bar (or number) above Players and Mobs, with 100% extra emotional damage to the developer.",
   "authors": ["AdyTech99"],
   "contributors": [
     "Translation key (ru_ru): Alexander317"

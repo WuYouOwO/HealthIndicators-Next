@@ -11,16 +11,16 @@ architectury {
 
 forgix {
     group = rootProject.maven_group
-    mergedJarName = "HealthIndicators-${rootProject.mod_version}.jar"
+    mergedJarName = "${rootProject.archives_name}-${rootProject.mod_version}.jar"
 
     neoforge {
         projectName = "neoforge"
-        jarLocation = "build/libs/HealthIndicators-neoforge-${rootProject.mod_version}.jar"
+        jarLocation = "build/libs/${rootProject.archives_name}-neoforge-${rootProject.mod_version}.jar"
 //        mixin "neoforge/src/main/resources/jahealthindicators.mixins.json"
     }
     fabric {
         projectName = "fabric"
-        jarLocation = "build/libs/HealthIndicators-fabric-${rootProject.mod_version}.jar"
+        jarLocation = "build/libs/${rootProject.archives_name}-fabric-${rootProject.mod_version}.jar"
 //        mixin "fabric/src/main/resources/healthindicators.mixins.json"
     }
 }

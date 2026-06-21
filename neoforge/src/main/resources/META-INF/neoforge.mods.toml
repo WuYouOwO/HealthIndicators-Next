@@ -6,24 +6,24 @@ license = "LGPL v3"
 [[mods]]
 modId = "healthindicators"
 version = "${version}"
-displayName = "Health Indicators"
+displayName = "Health Indicators: Next"
 authors = "AdyTech99"
 description = '''
-Simple damage indicator mod that shows a floating health bar (or number) above Players and Mobs.
+A lovingly hand-migrated 26.2 port of Health Indicators... finished exactly one day before the original mod rose from its 6-month grave and shipped its own 26.2 build. So now there are two. This is the one nobody asked for. Shows a floating health bar (or number) above Players and Mobs, with 100% extra emotional damage to the developer.
 '''
 logoFile = "assets/healthindicators/icon.png"
 
 [[dependencies.healthindicators]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21.11,)"
+versionRange = "[26.2,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.healthindicators]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21.11,)"
+versionRange = "[26.2,)"
 ordering = "NONE"
 side = "BOTH"
 
